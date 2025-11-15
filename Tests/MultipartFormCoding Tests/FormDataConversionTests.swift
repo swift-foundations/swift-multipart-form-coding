@@ -165,9 +165,10 @@ struct FormDataConversionTests {
         let (contentType, boundary) = formData.multipartContentType()
 
         // Assert
-        #expect(contentType.hasPrefix("multipart/form-data; boundary="))
-        #expect(!boundary.isEmpty)
-        #expect(contentType.contains(boundary))
+        #expect(contentType.type == "multipart")
+        #expect(contentType.subtype == "form-data")
+        #expect(contentType.parameters["boundary"] == boundary.value)
+        #expect(!boundary.value.isEmpty)
     }
 
     @Test("Custom boundary is preserved")
@@ -176,7 +177,7 @@ struct FormDataConversionTests {
         var formData = Form.Data.Entry.List()
         formData.append(name: "test", value: "value")
 
-        let customBoundary = "MyCustomBoundary123"
+        let customBoundary = try RFC_2046.Boundary("MyCustomBoundary123")
 
         // Act
         let multipart = try RFC_2046.Multipart(formData, boundary: customBoundary)
