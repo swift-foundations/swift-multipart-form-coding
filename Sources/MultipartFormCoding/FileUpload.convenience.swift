@@ -7,11 +7,11 @@
 
 import Foundation
 
-extension Multipart.FileUpload {
+extension FileUpload {
     public static func csv(
         fieldName: String = "file",
         filename: String? = nil,
-        maxSize: Int = Multipart.FileUpload.maxFileSize
+        maxSize: Int = FileUpload.maxFileSize
     ) throws -> Self {
         try .init(
             fieldName: fieldName,
@@ -24,7 +24,7 @@ extension Multipart.FileUpload {
     public static func pdf(
         fieldName: String = "file",
         filename: String? = nil,
-        maxSize: Int = Multipart.FileUpload.maxFileSize
+        maxSize: Int = FileUpload.maxFileSize
     ) throws -> Self {
         try .init(
             fieldName: fieldName,
@@ -37,7 +37,7 @@ extension Multipart.FileUpload {
     public static func excel(
         fieldName: String = "file",
         filename: String? = nil,
-        maxSize: Int = Multipart.FileUpload.maxFileSize
+        maxSize: Int = FileUpload.maxFileSize
     ) throws -> Self {
         try .init(
             fieldName: fieldName,
@@ -50,7 +50,7 @@ extension Multipart.FileUpload {
     public static func jpeg(
         fieldName: String = "file",
         filename: String? = nil,
-        maxSize: Int = Multipart.FileUpload.maxFileSize
+        maxSize: Int = FileUpload.maxFileSize
     ) throws -> Self {
         try .init(
             fieldName: fieldName,

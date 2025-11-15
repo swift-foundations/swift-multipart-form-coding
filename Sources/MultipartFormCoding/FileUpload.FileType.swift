@@ -1,7 +1,7 @@
 import Foundation
 import RFC_2045
 
-extension Multipart.FileUpload {
+extension FileUpload {
     /// Represents a file type with content validation capabilities.
     ///
     /// `FileType` encapsulates MIME type information, file extensions, and validation
@@ -64,7 +64,7 @@ extension Multipart.FileUpload {
 
 // MARK: - Predefined File Types
 
-extension Multipart.FileUpload.FileType {
+extension FileUpload.FileType {
     /// CSV (Comma-Separated Values) file type with UTF-8 validation.
     ///
     /// Validates that the uploaded data can be decoded as UTF-8 text,
@@ -78,7 +78,7 @@ extension Multipart.FileUpload.FileType {
         fileExtension: "csv"
     ) { (data: Foundation.Data) in
         guard let _ = String(data: data, encoding: .utf8) else {
-            throw Multipart.FileUpload.Error.contentMismatch(
+            throw FileUpload.Error.contentMismatch(
                 expected: "text/csv",
                 detected: nil
             )
@@ -98,7 +98,7 @@ extension Multipart.FileUpload.FileType {
         fileExtension: "pdf"
     ) { (data: Foundation.Data) in
         guard data.prefix(4).elementsEqual("%PDF".data(using: .utf8)!) else {
-            throw Multipart.FileUpload.Error.contentMismatch(
+            throw FileUpload.Error.contentMismatch(
                 expected: "application/pdf",
                 detected: nil
             )
@@ -156,8 +156,8 @@ extension Multipart.FileUpload.FileType {
     /// ## Example
     ///
     /// ```swift
-    /// let jpegFileType = Multipart.FileUpload.FileType.image(.jpeg)
-    /// let upload = Multipart.FileUpload(
+    /// let jpegFileType = FileUpload.FileType.image(.jpeg)
+    /// let upload = FileUpload(
     ///     fieldName: "photo",
     ///     filename: "image.jpg",
     ///     fileType: jpegFileType
@@ -169,9 +169,9 @@ extension Multipart.FileUpload.FileType {
     /// Image types include built-in magic number validation to prevent
     /// malicious files disguised as images from being uploaded.
     nonisolated
-    public static func image(_ type: ImageType) -> Multipart.FileUpload.FileType
+    public static func image(_ type: ImageType) -> FileUpload.FileType
     {
-        Multipart.FileUpload.FileType(
+        FileUpload.FileType(
             contentType: type.contentType,
             fileExtension: type.fileExtension,
             validate: type.validate

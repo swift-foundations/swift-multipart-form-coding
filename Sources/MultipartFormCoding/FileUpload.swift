@@ -4,7 +4,7 @@ import RFC_2046
 
 /// A conversion that handles file uploads in multipart/form-data format.
 ///
-/// `Multipart.FileUpload` provides secure file upload functionality with built-in
+/// `FileUpload` provides secure file upload functionality with built-in
 /// validation, size limits, and content type checking. It automatically generates
 /// proper multipart boundaries and headers according to RFC 7578.
 ///
@@ -20,7 +20,7 @@ import RFC_2046
 ///
 /// ```swift
 /// // Create file upload for images
-/// let imageUpload = Multipart.FileUpload(
+/// let imageUpload = FileUpload(
 ///     fieldName: "avatar",
 ///     filename: "profile.jpg",
 ///     fileType: .image(.jpeg)
@@ -37,7 +37,7 @@ import RFC_2046
 /// ## Custom File Size Limits
 ///
 /// ```swift
-/// let restrictedUpload = Multipart.FileUpload(
+/// let restrictedUpload = FileUpload(
 ///     fieldName: "thumbnail",
 ///     filename: "thumb.png",
 ///     fileType: .image(.png),
@@ -54,8 +54,7 @@ import RFC_2046
 ///
 /// - Important: Always validate file content server-side even with client-side restrictions.
 /// - Note: The conversion validates file content during both `apply` and `unapply` operations.
-extension Multipart {
-    public struct FileUpload: Sendable {
+public struct FileUpload: Sendable {
 
         /// The unique boundary string used to separate multipart fields.
         public let boundary: String
@@ -86,7 +85,7 @@ extension Multipart {
         /// ## Example
         ///
         /// ```swift
-        /// let pdfUpload = Multipart.FileUpload(
+        /// let pdfUpload = FileUpload(
         ///     fieldName: "document",
         ///     filename: "report.pdf",
         ///     fileType: .pdf,
@@ -97,7 +96,7 @@ extension Multipart {
             fieldName: String,
             filename: String,
             fileType: FileType,
-            maxSize: Int = Multipart.FileUpload.maxFileSize
+            maxSize: Int = FileUpload.maxFileSize
         ) throws {
             guard !fieldName.isEmpty else {
                 throw Error.emptyFieldName
@@ -139,9 +138,8 @@ extension Multipart {
             try fileType.validate(data)
         }
     }
-}
 
-extension Multipart.FileUpload {
+extension FileUpload {
     /// The Content-Type header value for this multipart file upload.
     ///
     /// Returns a properly formatted Content-Type header including the unique
@@ -152,7 +150,7 @@ extension Multipart.FileUpload {
     /// ## Usage
     ///
     /// ```swift
-    /// let upload = Multipart.FileUpload(/* ... */)
+    /// let upload = FileUpload(/* ... */)
     /// request.setValue(upload.contentType, forHTTPHeaderField: "Content-Type")
     /// ```
     public var contentType: String {
@@ -161,7 +159,7 @@ extension Multipart.FileUpload {
 }
 
 
-extension Multipart.FileUpload {
+extension FileUpload {
     /// Errors that can occur during multipart file upload processing.
     ///
     /// `Error` provides detailed error information for various failure
@@ -187,7 +185,7 @@ extension Multipart.FileUpload {
     /// ```swift
     /// do {
     ///     let validatedData = try fileUpload.apply(uploadData)
-    /// } catch let error as Multipart.FileUpload.Error {
+    /// } catch let error as FileUpload.Error {
     ///     switch error {
     ///     case .fileTooLarge(let size, let maxSize):
     ///         print("File \(size) bytes exceeds limit of \(maxSize) bytes")
@@ -248,7 +246,7 @@ extension Multipart.FileUpload {
     }
 }
 
-extension Multipart.FileUpload.Error {
+extension FileUpload.Error {
     /// Provides localized error descriptions for user-facing error messages.
     ///
     /// Each error case returns a descriptive message that can be displayed
