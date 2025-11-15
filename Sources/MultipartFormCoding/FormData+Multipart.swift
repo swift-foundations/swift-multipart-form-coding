@@ -207,13 +207,13 @@ extension Form.Data.Entry.List {
     /// request.setValue(contentType.headerValue, forHTTPHeaderField: "Content-Type")
     /// // contentType.headerValue = "multipart/form-data; boundary=----WebKitFormBoundary..."
     /// ```
-    public func multipartContentType(boundary: String? = nil) -> (contentType: RFC_2045.ContentType, boundary: String) {
-        let actualBoundary = boundary ?? RFC_2046.Multipart.generateBoundary()
+    public func multipartContentType(boundary: RFC_2046.Boundary? = nil) -> (contentType: RFC_2045.ContentType, boundary: RFC_2046.Boundary) {
+        let actualBoundary = boundary ?? RFC_2046.Boundary()
         return (
             contentType: RFC_2045.ContentType(
                 type: "multipart",
                 subtype: "form-data",
-                parameters: ["boundary": actualBoundary]
+                parameters: ["boundary": actualBoundary.value]
             ),
             boundary: actualBoundary
         )
