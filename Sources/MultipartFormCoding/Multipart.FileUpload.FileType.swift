@@ -1,6 +1,67 @@
 import Foundation
 import RFC_2045
 
+extension Multipart.FileUpload {
+    /// Represents a file type with content validation capabilities.
+    ///
+    /// `FileType` encapsulates MIME type information, file extensions, and validation
+    /// logic for different file formats. It provides a type-safe way to specify
+    /// expected file types and automatically validate uploaded content.
+    ///
+    /// ## Built-in File Types
+    ///
+    /// Common file types are provided as static properties:
+    /// - `.pdf` - PDF documents with magic number validation
+    /// - `.csv` - CSV text files with UTF-8 validation
+    /// - `.json` - JSON files with format validation
+    /// - `.text` - Plain text files
+    /// - `.image()` - Image files (see ``ImageType``)
+    ///
+    /// ## Custom File Types
+    ///
+    /// ```swift
+    /// let xmlType = FileType(
+    ///     contentType: RFC_2045.ContentType(type: "application", subtype: "xml"),
+    ///     fileExtension: "xml"
+    /// ) { data in
+    ///     // Custom validation logic
+    ///     guard data.starts(with: "<?xml".data(using: .utf8)!) else {
+    ///         throw Multipart.FileUpload.Error.contentMismatch(
+    ///             expected: "application/xml",
+    ///             detected: nil
+    ///         )
+    ///     }
+    /// }
+    /// ```
+    public struct FileType: Sendable {
+        /// The RFC 2045 Content-Type for this file format.
+        public let contentType: RFC_2045.ContentType
+
+        /// The file extension (without dot) for this file format.
+        public let fileExtension: String
+
+        /// Validation function that checks if data matches this file type.
+        let validate: @Sendable (Foundation.Data) throws -> Void
+
+        /// Creates a new file type specification.
+        ///
+        /// - Parameters:
+        ///   - contentType: The RFC 2045 Content-Type
+        ///   - fileExtension: The file extension without dot (e.g., "pdf")
+        ///   - validate: Optional validation function that throws on invalid data
+        public init(
+            contentType: RFC_2045.ContentType,
+            fileExtension: String,
+            validate: @escaping @Sendable (Foundation.Data) throws -> Void = { _ in }
+        ) {
+            self.contentType = contentType
+            self.fileExtension = fileExtension
+            self.validate = validate
+        }
+    }
+}
+
+
 // MARK: - Predefined File Types
 
 extension Multipart.FileUpload.FileType {

@@ -109,8 +109,7 @@ Enable URLRouting support using Swift Package Manager traits:
 dependencies: [
     .package(
         url: "https://github.com/coenttb/swift-multipart-form-coding",
-        from: "0.1.0",
-        traits: ["URLRouting"]  // Enable URLRouting trait
+        from: "0.1.0"
     )
 ]
 ```

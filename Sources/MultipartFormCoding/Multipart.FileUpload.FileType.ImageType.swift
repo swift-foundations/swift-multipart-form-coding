@@ -1,6 +1,63 @@
 import Foundation
 import RFC_2045
 
+extension Multipart.FileUpload.FileType {
+    /// Represents image file types with magic number validation.
+    ///
+    /// `ImageType` provides specialized validation for common image formats
+    /// using magic number (file signature) detection to prevent malicious
+    /// file uploads disguised as images.
+    ///
+    /// ## Supported Image Types
+    ///
+    /// - `.jpeg` - JPEG images (validates FF D8 FF magic numbers)
+    /// - `.png` - PNG images (validates PNG signature)
+    /// - `.gif` - GIF images (validates GIF87a/GIF89a signatures)
+    /// - `.webp` - WebP images (validates RIFF/WEBP signature)
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// let imageUpload = Multipart.FileUpload(
+    ///     fieldName: "photo",
+    ///     filename: "profile.jpg",
+    ///     fileType: .image(.jpeg)  // Validates JPEG magic numbers
+    /// )
+    /// ```
+    ///
+    /// ## Security
+    ///
+    /// Each image type validates the file's magic numbers (binary signature)
+    /// to ensure the file content matches the declared format, preventing
+    /// security vulnerabilities from disguised malicious files.
+    public struct ImageType: Sendable {
+        /// The RFC 2045 Content-Type for this image format.
+        public let contentType: RFC_2045.ContentType
+
+        /// The file extension (without dot) for this image format.
+        public let fileExtension: String
+
+        /// Validation function that checks magic numbers for this image type.
+        let validate: @Sendable (Foundation.Data) throws -> Void
+
+        /// Creates a new image type specification.
+        ///
+        /// - Parameters:
+        ///   - contentType: The RFC 2045 Content-Type
+        ///   - fileExtension: The file extension without dot (e.g., "jpg")
+        ///   - validate: Validation function that checks image magic numbers
+        public init(
+            contentType: RFC_2045.ContentType,
+            fileExtension: String,
+            validate: @escaping @Sendable (Foundation.Data) throws -> Void = { _ in }
+        ) {
+            self.contentType = contentType
+            self.fileExtension = fileExtension
+            self.validate = validate
+        }
+    }
+}
+
 // MARK: - Predefined Image Types
 
 extension Multipart.FileUpload.FileType.ImageType {
