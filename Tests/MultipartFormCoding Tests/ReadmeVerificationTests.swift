@@ -8,7 +8,7 @@ struct ReadmeVerificationTests {
     @Test("Example from README: Basic File Upload")
     func basicFileUpload() throws {
         // Create file upload with validation
-        let imageUpload = try Multipart.FileUpload(
+        let imageUpload = try FileUpload(
             fieldName: "avatar",
             filename: "profile.jpg",
             fileType: .image(.jpeg),
@@ -33,14 +33,14 @@ struct ReadmeVerificationTests {
     @Test("Example from README: Supported File Types")
     func supportedFileTypes() throws {
         // Images
-        let jpeg = try Multipart.FileUpload(
+        let jpeg = try FileUpload(
             fieldName: "photo",
             filename: "photo.jpg",
             fileType: .image(.jpeg)
         )
         #expect(jpeg.fileType.contentType.type == "image")
 
-        let png = try Multipart.FileUpload(
+        let png = try FileUpload(
             fieldName: "photo",
             filename: "photo.png",
             fileType: .image(.png)
@@ -48,14 +48,14 @@ struct ReadmeVerificationTests {
         #expect(png.fileType.contentType.subtype == "png")
 
         // Documents
-        let pdf = try Multipart.FileUpload(
+        let pdf = try FileUpload(
             fieldName: "document",
             filename: "file.pdf",
             fileType: .pdf
         )
         #expect(pdf.fileType.contentType.subtype == "pdf")
 
-        let csv = try Multipart.FileUpload(
+        let csv = try FileUpload(
             fieldName: "data",
             filename: "data.csv",
             fileType: .csv

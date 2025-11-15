@@ -7,7 +7,7 @@ struct FileUploadConvenienceTests {
 
     @Test("CSV factory with default parameters")
     func testCSVFactoryDefaults() throws {
-        let upload = try Multipart.FileUpload.csv()
+        let upload = try FileUpload.csv()
 
         #expect(!upload.boundary.isEmpty)
         #expect(upload.contentType.starts(with: "multipart/form-data"))
@@ -16,14 +16,14 @@ struct FileUploadConvenienceTests {
 
     @Test("CSV factory with custom field name")
     func testCSVFactoryCustomFieldName() throws {
-        let upload = try Multipart.FileUpload.csv(fieldName: "csvData")
+        let upload = try FileUpload.csv(fieldName: "csvData")
 
         #expect(!upload.boundary.isEmpty)
     }
 
     @Test("CSV factory with custom filename")
     func testCSVFactoryCustomFilename() throws {
-        let upload = try Multipart.FileUpload.csv(
+        let upload = try FileUpload.csv(
             fieldName: "data",
             filename: "export.csv"
         )
@@ -33,7 +33,7 @@ struct FileUploadConvenienceTests {
 
     @Test("CSV factory with custom max size")
     func testCSVFactoryCustomMaxSize() throws {
-        let upload = try Multipart.FileUpload.csv(
+        let upload = try FileUpload.csv(
             maxSize: 1024 * 1024  // 1MB
         )
 
@@ -42,7 +42,7 @@ struct FileUploadConvenienceTests {
 
     @Test("CSV factory with all custom parameters")
     func testCSVFactoryAllCustom() throws {
-        let upload = try Multipart.FileUpload.csv(
+        let upload = try FileUpload.csv(
             fieldName: "csvFile",
             filename: "data.csv",
             maxSize: 5 * 1024 * 1024
@@ -54,7 +54,7 @@ struct FileUploadConvenienceTests {
 
     @Test("PDF factory with default parameters")
     func testPDFFactoryDefaults() throws {
-        let upload = try Multipart.FileUpload.pdf()
+        let upload = try FileUpload.pdf()
 
         #expect(!upload.boundary.isEmpty)
         #expect(upload.contentType.starts(with: "multipart/form-data"))
@@ -62,7 +62,7 @@ struct FileUploadConvenienceTests {
 
     @Test("PDF factory with custom parameters")
     func testPDFFactoryCustom() throws {
-        let upload = try Multipart.FileUpload.pdf(
+        let upload = try FileUpload.pdf(
             fieldName: "document",
             filename: "report.pdf",
             maxSize: 10 * 1024 * 1024
@@ -73,7 +73,7 @@ struct FileUploadConvenienceTests {
 
     @Test("Excel factory with default parameters")
     func testExcelFactoryDefaults() throws {
-        let upload = try Multipart.FileUpload.excel()
+        let upload = try FileUpload.excel()
 
         #expect(!upload.boundary.isEmpty)
         #expect(upload.contentType.starts(with: "multipart/form-data"))
@@ -81,7 +81,7 @@ struct FileUploadConvenienceTests {
 
     @Test("Excel factory with custom parameters")
     func testExcelFactoryCustom() throws {
-        let upload = try Multipart.FileUpload.excel(
+        let upload = try FileUpload.excel(
             fieldName: "spreadsheet",
             filename: "data.xlsx",
             maxSize: 20 * 1024 * 1024
@@ -92,7 +92,7 @@ struct FileUploadConvenienceTests {
 
     @Test("JPEG factory with default parameters")
     func testJPEGFactoryDefaults() throws {
-        let upload = try Multipart.FileUpload.jpeg()
+        let upload = try FileUpload.jpeg()
 
         #expect(!upload.boundary.isEmpty)
         #expect(upload.contentType.starts(with: "multipart/form-data"))
@@ -100,7 +100,7 @@ struct FileUploadConvenienceTests {
 
     @Test("JPEG factory with custom parameters")
     func testJPEGFactoryCustom() throws {
-        let upload = try Multipart.FileUpload.jpeg(
+        let upload = try FileUpload.jpeg(
             fieldName: "photo",
             filename: "profile.jpg",
             maxSize: 5 * 1024 * 1024
@@ -115,28 +115,28 @@ struct FileUploadFactoryDefaultFilenamesTests {
 
     @Test("CSV factory uses default filename when nil")
     func testCSVDefaultFilename() throws {
-        let upload = try Multipart.FileUpload.csv(filename: nil)
+        let upload = try FileUpload.csv(filename: nil)
         // Default filename "file.csv" is used internally
         #expect(!upload.boundary.isEmpty)
     }
 
     @Test("PDF factory uses default filename when nil")
     func testPDFDefaultFilename() throws {
-        let upload = try Multipart.FileUpload.pdf(filename: nil)
+        let upload = try FileUpload.pdf(filename: nil)
         // Default filename "file.pdf" is used internally
         #expect(!upload.boundary.isEmpty)
     }
 
     @Test("Excel factory uses default filename when nil")
     func testExcelDefaultFilename() throws {
-        let upload = try Multipart.FileUpload.excel(filename: nil)
+        let upload = try FileUpload.excel(filename: nil)
         // Default filename "file.xlsx" is used internally
         #expect(!upload.boundary.isEmpty)
     }
 
     @Test("JPEG factory uses default filename when nil")
     func testJPEGDefaultFilename() throws {
-        let upload = try Multipart.FileUpload.jpeg(filename: nil)
+        let upload = try FileUpload.jpeg(filename: nil)
         // Default filename "file.jpg" is used internally
         #expect(!upload.boundary.isEmpty)
     }
@@ -163,7 +163,7 @@ struct FileUploadFactoryValidationTests {
 
     @Test("JPEG factory creates upload that validates JPEGs")
     func testJPEGFactoryValidation() throws {
-        let upload = try Multipart.FileUpload.jpeg()
+        let upload = try FileUpload.jpeg()
         let validJPEG = createValidJPEG()
 
         try upload.validate(validJPEG)
@@ -171,7 +171,7 @@ struct FileUploadFactoryValidationTests {
 
     @Test("PDF factory creates upload that validates PDFs")
     func testPDFFactoryValidation() throws {
-        let upload = try Multipart.FileUpload.pdf()
+        let upload = try FileUpload.pdf()
         let validPDF = createValidPDF()
 
         try upload.validate(validPDF)
@@ -179,7 +179,7 @@ struct FileUploadFactoryValidationTests {
 
     @Test("CSV factory creates upload that validates CSV")
     func testCSVFactoryValidation() throws {
-        let upload = try Multipart.FileUpload.csv()
+        let upload = try FileUpload.csv()
         let validCSV = createValidCSV()
 
         try upload.validate(validCSV)
@@ -187,9 +187,9 @@ struct FileUploadFactoryValidationTests {
 
     @Test("Factory instances have unique boundaries")
     func testFactoryUniqueBoundaries() throws {
-        let csv1 = try Multipart.FileUpload.csv()
-        let csv2 = try Multipart.FileUpload.csv()
-        let pdf1 = try Multipart.FileUpload.pdf()
+        let csv1 = try FileUpload.csv()
+        let csv2 = try FileUpload.csv()
+        let pdf1 = try FileUpload.pdf()
 
         #expect(csv1.boundary != csv2.boundary)
         #expect(csv1.boundary != pdf1.boundary)

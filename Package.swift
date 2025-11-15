@@ -13,15 +13,17 @@ extension Target.Dependency {
     static var rfc2045: Self { .product(name: "RFC 2045", package: "swift-rfc-2045") }
     static var rfc2046: Self { .product(name: "RFC 2046", package: "swift-rfc-2046") }
     static var rfc7578: Self { .product(name: "RFC 7578", package: "swift-rfc-7578") }
+    static var whatwgHTMLForms: Self { .product(name: "WHATWG HTML Forms", package: "swift-whatwg-html") }
+    static var whatwgHTMLFormData: Self { .product(name: "WHATWG HTML FormData", package: "swift-whatwg-html") }
 }
 
 let package = Package(
     name: "swift-multipart-form-coding",
     platforms: [
-        .macOS(.v14),
-        .iOS(.v17),
-        .tvOS(.v17),
-        .watchOS(.v10)
+        .macOS(.v15),
+        .iOS(.v18),
+        .tvOS(.v18),
+        .watchOS(.v11)
     ],
     products: [
         .library(name: .multipartFormCoding, targets: [.multipartFormCoding])
@@ -29,7 +31,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/swift-standards/swift-rfc-2045.git", from: "0.1.0"),
         .package(url: "https://github.com/swift-standards/swift-rfc-2046.git", from: "0.2.0"),
-        .package(url: "https://github.com/swift-standards/swift-rfc-7578.git", from: "0.2.2")
+        .package(url: "https://github.com/swift-standards/swift-rfc-7578.git", from: "0.2.2"),
+        .package(path: "/Users/coen/Developer/swift-standards/swift-whatwg-html")
     ],
     targets: [
         .target(
@@ -37,7 +40,9 @@ let package = Package(
             dependencies: [
                 .rfc2045,
                 .rfc2046,
-                .rfc7578
+                .rfc7578,
+                .whatwgHTMLForms,
+                .whatwgHTMLFormData
             ]
         ),
         .testTarget(

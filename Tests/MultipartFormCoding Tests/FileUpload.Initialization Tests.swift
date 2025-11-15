@@ -7,7 +7,7 @@ struct FileUploadInitializationTests {
 
     @Test("Initializes with valid parameters")
     func testValidInitialization() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "photo",
             filename: "test.jpg",
             fileType: .image(.jpeg)
@@ -19,13 +19,13 @@ struct FileUploadInitializationTests {
 
     @Test("Generates unique boundaries for each instance")
     func testUniqueBoundaries() throws {
-        let upload1 = try Multipart.FileUpload(
+        let upload1 = try FileUpload(
             fieldName: "file1",
             filename: "test1.jpg",
             fileType: .image(.jpeg)
         )
 
-        let upload2 = try Multipart.FileUpload(
+        let upload2 = try FileUpload(
             fieldName: "file2",
             filename: "test2.jpg",
             fileType: .image(.jpeg)
@@ -37,7 +37,7 @@ struct FileUploadInitializationTests {
     @Test("Initializes with custom max size")
     func testCustomMaxSize() throws {
         let customSize = 1024 * 1024  // 1MB
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "thumbnail",
             filename: "thumb.jpg",
             fileType: .image(.jpeg),
@@ -49,7 +49,7 @@ struct FileUploadInitializationTests {
 
     @Test("Content-Type header includes boundary")
     func testContentTypeHeader() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "file",
             filename: "test.jpg",
             fileType: .image(.jpeg)
@@ -65,8 +65,8 @@ struct FileUploadValidationErrorTests {
 
     @Test("Throws emptyFieldName when field name is empty")
     func testEmptyFieldName() {
-        #expect(throws: Multipart.FileUpload.Error.emptyFieldName) {
-            _ = try Multipart.FileUpload(
+        #expect(throws: FileUpload.Error.emptyFieldName) {
+            _ = try FileUpload(
                 fieldName: "",
                 filename: "test.jpg",
                 fileType: .pdf
@@ -76,8 +76,8 @@ struct FileUploadValidationErrorTests {
 
     @Test("Throws emptyFilename when filename is empty")
     func testEmptyFilename() {
-        #expect(throws: Multipart.FileUpload.Error.emptyFilename) {
-            _ = try Multipart.FileUpload(
+        #expect(throws: FileUpload.Error.emptyFilename) {
+            _ = try FileUpload(
                 fieldName: "file",
                 filename: "",
                 fileType: .pdf
@@ -88,13 +88,13 @@ struct FileUploadValidationErrorTests {
     @Test("Throws invalidFilename for forward slash")
     func testFilenameWithForwardSlash() {
         do {
-            _ = try Multipart.FileUpload(
+            _ = try FileUpload(
                 fieldName: "file",
                 filename: "path/to/test.jpg",
                 fileType: .pdf
             )
             Issue.record("Expected invalidFilename error")
-        } catch let error as Multipart.FileUpload.Error {
+        } catch let error as FileUpload.Error {
             if case .invalidFilename(let filename) = error {
                 #expect(filename == "path/to/test.jpg")
             } else {
@@ -108,13 +108,13 @@ struct FileUploadValidationErrorTests {
     @Test("Throws invalidFilename for backslash")
     func testFilenameWithBackslash() {
         do {
-            _ = try Multipart.FileUpload(
+            _ = try FileUpload(
                 fieldName: "file",
                 filename: "path\\test.jpg",
                 fileType: .pdf
             )
             Issue.record("Expected invalidFilename error")
-        } catch let error as Multipart.FileUpload.Error {
+        } catch let error as FileUpload.Error {
             if case .invalidFilename(let filename) = error {
                 #expect(filename == "path\\test.jpg")
             } else {
@@ -128,14 +128,14 @@ struct FileUploadValidationErrorTests {
     @Test("Throws invalidMaxSize for zero")
     func testZeroMaxSize() {
         do {
-            _ = try Multipart.FileUpload(
+            _ = try FileUpload(
                 fieldName: "file",
                 filename: "test.jpg",
                 fileType: .pdf,
                 maxSize: 0
             )
             Issue.record("Expected invalidMaxSize error")
-        } catch let error as Multipart.FileUpload.Error {
+        } catch let error as FileUpload.Error {
             if case .invalidMaxSize(let size) = error {
                 #expect(size == 0)
             } else {
@@ -149,14 +149,14 @@ struct FileUploadValidationErrorTests {
     @Test("Throws invalidMaxSize for negative value")
     func testNegativeMaxSize() {
         do {
-            _ = try Multipart.FileUpload(
+            _ = try FileUpload(
                 fieldName: "file",
                 filename: "test.jpg",
                 fileType: .pdf,
                 maxSize: -100
             )
             Issue.record("Expected invalidMaxSize error")
-        } catch let error as Multipart.FileUpload.Error {
+        } catch let error as FileUpload.Error {
             if case .invalidMaxSize(let size) = error {
                 #expect(size == -100)
             } else {
@@ -172,14 +172,14 @@ struct FileUploadValidationErrorTests {
         let excessiveSize = 2 * 1024 * 1024 * 1024  // 2GB
 
         do {
-            _ = try Multipart.FileUpload(
+            _ = try FileUpload(
                 fieldName: "file",
                 filename: "test.jpg",
                 fileType: .pdf,
                 maxSize: excessiveSize
             )
             Issue.record("Expected maxSizeExceedsLimit error")
-        } catch let error as Multipart.FileUpload.Error {
+        } catch let error as FileUpload.Error {
             if case .maxSizeExceedsLimit(let size) = error {
                 #expect(size == excessiveSize)
             } else {
@@ -192,7 +192,7 @@ struct FileUploadValidationErrorTests {
 
     @Test("Accepts max size at 1GB limit")
     func testMaxSizeAtLimit() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "file",
             filename: "test.jpg",
             fileType: .pdf,

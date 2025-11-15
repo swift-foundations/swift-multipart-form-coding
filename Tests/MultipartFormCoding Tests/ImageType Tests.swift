@@ -13,7 +13,7 @@ struct ImageTypeJPEGTests {
 
     @Test("Validates correct JPEG magic numbers")
     func testValidJPEG() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "photo",
             filename: "test.jpg",
             fileType: .image(.jpeg)
@@ -24,7 +24,7 @@ struct ImageTypeJPEGTests {
 
     @Test("Rejects invalid JPEG magic numbers")
     func testInvalidJPEG() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "photo",
             filename: "test.jpg",
             fileType: .image(.jpeg)
@@ -32,7 +32,7 @@ struct ImageTypeJPEGTests {
 
         let invalidData = Data([0x00, 0x00, 0x00])
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
@@ -49,7 +49,7 @@ struct ImageTypePNGTests {
 
     @Test("Validates correct PNG signature")
     func testValidPNG() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "image",
             filename: "test.png",
             fileType: .image(.png)
@@ -60,7 +60,7 @@ struct ImageTypePNGTests {
 
     @Test("Rejects invalid PNG signature")
     func testInvalidPNG() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "image",
             filename: "test.png",
             fileType: .image(.png)
@@ -68,7 +68,7 @@ struct ImageTypePNGTests {
 
         let invalidData = Data(repeating: 0x00, count: 8)
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
@@ -79,7 +79,7 @@ struct ImageTypeGIFTests {
 
     @Test("Validates GIF89a signature")
     func testValidGIF89a() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "animation",
             filename: "test.gif",
             fileType: .image(.gif)
@@ -93,7 +93,7 @@ struct ImageTypeGIFTests {
 
     @Test("Validates GIF87a signature")
     func testValidGIF87a() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "animation",
             filename: "test.gif",
             fileType: .image(.gif)
@@ -107,7 +107,7 @@ struct ImageTypeGIFTests {
 
     @Test("Rejects invalid GIF signature")
     func testInvalidGIF() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "animation",
             filename: "test.gif",
             fileType: .image(.gif)
@@ -115,7 +115,7 @@ struct ImageTypeGIFTests {
 
         let invalidData = Data("NOTGIF".utf8)
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
@@ -134,7 +134,7 @@ struct ImageTypeWebPTests {
 
     @Test("Validates correct WebP structure")
     func testValidWebP() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "image",
             filename: "test.webp",
             fileType: .image(.webp)
@@ -145,7 +145,7 @@ struct ImageTypeWebPTests {
 
     @Test("Rejects WebP without RIFF header")
     func testInvalidWebPNoRIFF() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "image",
             filename: "test.webp",
             fileType: .image(.webp)
@@ -155,14 +155,14 @@ struct ImageTypeWebPTests {
         invalidData.append(Data([0x00, 0x00, 0x00, 0x00]))
         invalidData.append(Data("WEBP".utf8))
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
 
     @Test("Rejects WebP without WEBP identifier")
     func testInvalidWebPNoWEBP() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "image",
             filename: "test.webp",
             fileType: .image(.webp)
@@ -172,7 +172,7 @@ struct ImageTypeWebPTests {
         invalidData.append(Data([0x00, 0x00, 0x00, 0x00]))
         invalidData.append(Data("XXXX".utf8))
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
@@ -183,7 +183,7 @@ struct ImageTypeTIFFTests {
 
     @Test("Validates Intel byte order TIFF")
     func testValidTIFFIntel() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "scan",
             filename: "test.tiff",
             fileType: .image(.tiff)
@@ -197,7 +197,7 @@ struct ImageTypeTIFFTests {
 
     @Test("Validates Motorola byte order TIFF")
     func testValidTIFFMotorola() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "scan",
             filename: "test.tiff",
             fileType: .image(.tiff)
@@ -211,7 +211,7 @@ struct ImageTypeTIFFTests {
 
     @Test("Rejects invalid TIFF magic numbers")
     func testInvalidTIFF() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "scan",
             filename: "test.tiff",
             fileType: .image(.tiff)
@@ -219,7 +219,7 @@ struct ImageTypeTIFFTests {
 
         let invalidData = Data([0x00, 0x00, 0x00, 0x00])
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
@@ -236,7 +236,7 @@ struct ImageTypeBMPTests {
 
     @Test("Validates correct BMP signature")
     func testValidBMP() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "bitmap",
             filename: "test.bmp",
             fileType: .image(.bmp)
@@ -247,7 +247,7 @@ struct ImageTypeBMPTests {
 
     @Test("Rejects invalid BMP signature")
     func testInvalidBMP() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "bitmap",
             filename: "test.bmp",
             fileType: .image(.bmp)
@@ -255,7 +255,7 @@ struct ImageTypeBMPTests {
 
         let invalidData = Data([0x00, 0x00])
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
@@ -274,7 +274,7 @@ struct ImageTypeHEICTests {
 
     @Test("Validates correct HEIC container structure")
     func testValidHEIC() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "photo",
             filename: "test.heic",
             fileType: .image(.heic)
@@ -285,7 +285,7 @@ struct ImageTypeHEICTests {
 
     @Test("Rejects HEIC without ftyp box")
     func testInvalidHEICNoFtyp() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "photo",
             filename: "test.heic",
             fileType: .image(.heic)
@@ -295,14 +295,14 @@ struct ImageTypeHEICTests {
         invalidData.append(Data("XXXX".utf8))
         invalidData.append(Data("heic".utf8))
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
 
     @Test("Rejects HEIC without heic brand")
     func testInvalidHEICNoBrand() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "photo",
             filename: "test.heic",
             fileType: .image(.heic)
@@ -312,14 +312,14 @@ struct ImageTypeHEICTests {
         invalidData.append(Data("ftyp".utf8))
         invalidData.append(Data("XXXX".utf8))
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
 
     @Test("Rejects HEIC data that is too short")
     func testInvalidHEICTooShort() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "photo",
             filename: "test.heic",
             fileType: .image(.heic)
@@ -327,7 +327,7 @@ struct ImageTypeHEICTests {
 
         let invalidData = Data(repeating: 0x00, count: 10)  // Less than 12 bytes
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
@@ -346,7 +346,7 @@ struct ImageTypeAVIFTests {
 
     @Test("Validates correct AVIF container structure")
     func testValidAVIF() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "photo",
             filename: "test.avif",
             fileType: .image(.avif)
@@ -357,7 +357,7 @@ struct ImageTypeAVIFTests {
 
     @Test("Rejects AVIF without ftyp box")
     func testInvalidAVIFNoFtyp() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "photo",
             filename: "test.avif",
             fileType: .image(.avif)
@@ -367,14 +367,14 @@ struct ImageTypeAVIFTests {
         invalidData.append(Data("XXXX".utf8))
         invalidData.append(Data("avif".utf8))
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
 
     @Test("Rejects AVIF without avif brand")
     func testInvalidAVIFNoBrand() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "photo",
             filename: "test.avif",
             fileType: .image(.avif)
@@ -384,14 +384,14 @@ struct ImageTypeAVIFTests {
         invalidData.append(Data("ftyp".utf8))
         invalidData.append(Data("XXXX".utf8))
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
 
     @Test("Rejects AVIF data that is too short")
     func testInvalidAVIFTooShort() throws {
-        let upload = try Multipart.FileUpload(
+        let upload = try FileUpload(
             fieldName: "photo",
             filename: "test.avif",
             fileType: .image(.avif)
@@ -399,7 +399,7 @@ struct ImageTypeAVIFTests {
 
         let invalidData = Data(repeating: 0x00, count: 10)  // Less than 12 bytes
 
-        #expect(throws: Multipart.FileUpload.Error.self) {
+        #expect(throws: FileUpload.Error.self) {
             try upload.validate(invalidData)
         }
     }
