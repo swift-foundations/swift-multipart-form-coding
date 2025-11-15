@@ -129,7 +129,7 @@ extension RFC_2046.Multipart {
     ///
     /// - Parameters:
     ///   - formData: The form data to encode
-    ///   - boundary: Optional custom boundary string. If nil, generates a secure random boundary
+    ///   - boundary: Optional custom boundary. If nil, generates a secure random boundary
     ///
     /// - Throws: Encoding errors if form data cannot be converted
     ///
@@ -150,7 +150,7 @@ extension RFC_2046.Multipart {
     /// let multipart = try RFC_2046.Multipart(formData, boundary: nil)
     /// let data = try multipart.encode()
     /// ```
-    public init(_ formData: Form.Data.Entry.List, boundary: String? = nil) throws {
+    public init(_ formData: Form.Data.Entry.List, boundary: RFC_2046.Boundary? = nil) throws {
         // Create body parts manually to preserve multiple values for same field name
         var parts: [RFC_2046.BodyPart] = []
 
