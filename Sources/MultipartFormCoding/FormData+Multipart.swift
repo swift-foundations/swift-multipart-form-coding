@@ -13,9 +13,9 @@
 import Foundation
 import WHATWG_HTML_Forms
 import WHATWG_HTML_FormData
+import RFC_2045
 import RFC_2046
 import RFC_7578
-import RFC_2045
 
 // MARK: - Multipart → Form.Data.Entry.List
 
@@ -190,12 +190,12 @@ extension RFC_2046.Multipart {
 extension Form.Data.Entry.List {
     /// Generates a Content-Type header value for multipart/form-data encoding.
     ///
-    /// Returns the properly formatted Content-Type header including a unique
+    /// Returns a properly typed RFC 2045 Content-Type including a unique
     /// boundary parameter. If no custom boundary is provided, a cryptographically
     /// secure random boundary is generated.
     ///
     /// - Parameter boundary: Optional custom boundary string
-    /// - Returns: A tuple containing the Content-Type header value and the boundary used
+    /// - Returns: A tuple containing the RFC 2045 Content-Type and the boundary used
     ///
     /// ## Example
     ///
@@ -204,13 +204,17 @@ extension Form.Data.Entry.List {
     /// let (contentType, boundary) = formData.multipartContentType()
     ///
     /// // Use in HTTP request
-    /// request.setValue(contentType, forHTTPHeaderField: "Content-Type")
-    /// // contentType = "multipart/form-data; boundary=----WebKitFormBoundary..."
+    /// request.setValue(contentType.headerValue, forHTTPHeaderField: "Content-Type")
+    /// // contentType.headerValue = "multipart/form-data; boundary=----WebKitFormBoundary..."
     /// ```
-    public func multipartContentType(boundary: String? = nil) -> (contentType: String, boundary: String) {
+    public func multipartContentType(boundary: String? = nil) -> (contentType: RFC_2045.ContentType, boundary: String) {
         let actualBoundary = boundary ?? RFC_2046.Multipart.generateBoundary()
         return (
-            contentType: "multipart/form-data; boundary=\(actualBoundary)",
+            contentType: RFC_2045.ContentType(
+                type: "multipart",
+                subtype: "form-data",
+                parameters: ["boundary": actualBoundary]
+            ),
             boundary: actualBoundary
         )
     }
