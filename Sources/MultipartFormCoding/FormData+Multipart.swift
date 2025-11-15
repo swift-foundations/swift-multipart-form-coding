@@ -15,6 +15,7 @@ import WHATWG_HTML_Forms
 import WHATWG_HTML_FormData
 import RFC_2045
 import RFC_2046
+import RFC_2183
 import RFC_7578
 
 // MARK: - Multipart → Form.Data.Entry.List
@@ -46,20 +47,20 @@ extension Form.Data.Entry.List {
 
         // Parse all parts directly to preserve multiple values for same field name
         for part in multipart.parts {
-            // Parse Content-Disposition header
-            guard let disposition = part.headers["Content-Disposition"],
-                  disposition.contains("form-data") else {
+            // Use typed Content-Disposition header
+            guard let disposition = part.typedHeaders.contentDisposition,
+                  disposition.type == .formData else {
                 continue
             }
 
-            // Extract field name
-            guard let fieldName = Self.parseFieldName(from: disposition) else {
+            // Extract field name from Content-Disposition
+            guard let fieldName = disposition.name else {
                 continue
             }
 
             // Check if this part has a filename (indicating a file upload)
-            if let filename = Self.parseFilename(from: disposition) {
-                let contentType = part.headers["Content-Type"] ?? "application/octet-stream"
+            if let filename = disposition.filename {
+                let contentType = part.typedHeaders.contentType?.headerValue ?? "application/octet-stream"
 
                 self.append(
                     name: fieldName,
@@ -80,40 +81,24 @@ extension Form.Data.Entry.List {
 
     /// Parses the field name from a Content-Disposition header.
     ///
-    /// Extracts the value from: `name="fieldname"`
-    ///
     /// - Parameter disposition: The Content-Disposition header value
     /// - Returns: The field name, or nil if parsing fails
+    ///
+    /// - Deprecated: Use `RFC_2183.ContentDisposition(parsing:).name` instead
+    @available(*, deprecated, message: "Use RFC_2183.ContentDisposition(parsing:).name instead")
     private static func parseFieldName(from disposition: String) -> String? {
-        let pattern = #"name=\"([^\"]+)\""#
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(
-                in: disposition,
-                range: NSRange(disposition.startIndex..., in: disposition)
-              ),
-              let range = Range(match.range(at: 1), in: disposition) else {
-            return nil
-        }
-        return String(disposition[range])
+        (try? RFC_2183.ContentDisposition(parsing: disposition))?.name
     }
 
     /// Parses the filename from a Content-Disposition header.
     ///
-    /// Extracts the value from: `filename="file.txt"`
-    ///
     /// - Parameter disposition: The Content-Disposition header value
     /// - Returns: The filename, or nil if not present
+    ///
+    /// - Deprecated: Use `RFC_2183.ContentDisposition(parsing:).filename` instead
+    @available(*, deprecated, message: "Use RFC_2183.ContentDisposition(parsing:).filename instead")
     private static func parseFilename(from disposition: String) -> String? {
-        let pattern = #"filename=\"([^\"]+)\""#
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(
-                in: disposition,
-                range: NSRange(disposition.startIndex..., in: disposition)
-              ),
-              let range = Range(match.range(at: 1), in: disposition) else {
-            return nil
-        }
-        return String(disposition[range])
+        (try? RFC_2183.ContentDisposition(parsing: disposition))?.filename
     }
 }
 
@@ -157,22 +142,26 @@ extension RFC_2046.Multipart {
         for entry in formData {
             switch entry.value {
             case .string(let value):
-                // Create text field part
-                let headers = [
-                    "Content-Disposition": "form-data; name=\"\(entry.name)\""
-                ]
+                // Create text field part using typed Headers
                 let content = Data(value.utf8)
-                parts.append(RFC_2046.BodyPart(headers: headers, content: content))
+                parts.append(RFC_2046.BodyPart(
+                    headers: .formDataTextField(name: entry.name),
+                    content: content
+                ))
 
             case .file(let file):
-                // Create file upload part
-                var headers = [
-                    "Content-Disposition": "form-data; name=\"\(entry.name)\"; filename=\"\(file.name)\""
-                ]
-                if !file.type.isEmpty {
-                    headers["Content-Type"] = file.type
-                }
-                parts.append(RFC_2046.BodyPart(headers: headers, content: file.body))
+                // Create file upload part using typed Headers
+                let contentType = !file.type.isEmpty
+                    ? try? RFC_2045.ContentType(parsing: file.type)
+                    : nil
+                parts.append(RFC_2046.BodyPart(
+                    headers: .formDataFile(
+                        name: entry.name,
+                        filename: file.name,
+                        contentType: contentType
+                    ),
+                    content: file.body
+                ))
             }
         }
 

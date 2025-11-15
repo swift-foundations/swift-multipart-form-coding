@@ -98,7 +98,7 @@ struct FormDataConversionTests {
     func multipartToFormDataWithFile() throws {
         // Arrange
         let imageData = Data([0xFF, 0xD8, 0xFF, 0xE0]) // JPEG magic number
-        let file = try RFC_7578.FormData.File(
+        let file = try RFC_7578.Form.Data.File(
             fieldName: "photo",
             filename: "image.jpg",
             contentType: RFC_2045.ContentType(type: "image", subtype: "jpeg"),
@@ -177,7 +177,7 @@ struct FormDataConversionTests {
         var formData = Form.Data.Entry.List()
         formData.append(name: "test", value: "value")
 
-        let customBoundary = try RFC_2046.Boundary("MyCustomBoundary123")
+        let customBoundary = RFC_2046.Boundary("MyCustomBoundary123")
 
         // Act
         let multipart = try RFC_2046.Multipart(formData, boundary: customBoundary)

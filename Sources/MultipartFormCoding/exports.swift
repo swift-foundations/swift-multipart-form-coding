@@ -5,5 +5,6 @@
 //  Created by Coen ten Thije Boonkkamp on 13/01/2025.
 //
 
-// Pure bridge package - no re-exports needed
+// Export RFC 2183 for Content-Disposition support
+@_exported import RFC_2183
 
