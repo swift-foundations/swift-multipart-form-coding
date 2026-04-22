@@ -30,7 +30,7 @@ let package = Package(
         .library(name: .multipartFormCoding, targets: [.multipartFormCoding])
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-standards/swift-rfc-2045.git", from: "0.1.0"),
+        .package(url: "https://github.com/swift-ietf/swift-rfc-2045.git", from: "0.1.0"),
         .package(path: "/Users/coen/Developer/swift-standards/swift-rfc-2046"),
         .package(path: "/Users/coen/Developer/swift-standards/swift-rfc-2183"),
         .package(path: "/Users/coen/Developer/swift-standards/swift-rfc-7578"),
