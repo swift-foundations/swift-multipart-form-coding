@@ -18,6 +18,7 @@ import WHATWG_HTML_FormData
 import RFC_2046
 import RFC_7578
 import RFC_2045
+import RFC_2183
 
 @Suite("Form.Data ↔ Multipart Conversion Tests")
 struct FormDataConversionTests {
@@ -51,7 +52,7 @@ struct FormDataConversionTests {
             file: Form.Data.File(
                 name: "photo.jpg",
                 type: "image/jpeg",
-                body: Data([0xFF, 0xD8, 0xFF, 0xE0]) // JPEG magic number
+                body: [0xFF, 0xD8, 0xFF, 0xE0] // JPEG magic number
             )
         )
 
@@ -68,7 +69,7 @@ struct FormDataConversionTests {
 
         // Check file field exists in parts
         let hasAvatarPart = multipart.parts.contains { part in
-            guard let disposition = part.headers["Content-Disposition"] else { return false }
+            guard let disposition = part.headers[.contentDisposition] else { return false }
             return disposition.contains("name=\"avatar\"") && disposition.contains("filename=\"photo.jpg\"")
         }
         #expect(hasAvatarPart)
@@ -97,11 +98,11 @@ struct FormDataConversionTests {
     @Test("Multipart to Form.Data.Entry.List conversion with file")
     func multipartToFormDataWithFile() throws {
         // Arrange
-        let imageData = Data([0xFF, 0xD8, 0xFF, 0xE0]) // JPEG magic number
+        let imageData: [UInt8] = [0xFF, 0xD8, 0xFF, 0xE0] // JPEG magic number
         let file = try RFC_7578.Form.Data.File(
             fieldName: "photo",
-            filename: "image.jpg",
-            contentType: RFC_2045.ContentType(type: "image", subtype: "jpeg"),
+            filename: try RFC_2183.Filename("image.jpg"),
+            contentType: .imageJPEG,
             content: imageData
         )
 
@@ -138,7 +139,7 @@ struct FormDataConversionTests {
             file: Form.Data.File(
                 name: "test.txt",
                 type: "text/plain",
-                body: Data("Hello, World!".utf8)
+                body: Array("Hello, World!".utf8)
             )
         )
 
@@ -153,7 +154,7 @@ struct FormDataConversionTests {
 
         let restoredFile = restored.first(named: "file1")?.fileValue
         #expect(restoredFile?.name == "test.txt")
-        #expect(restoredFile?.body == Data("Hello, World!".utf8))
+        #expect(restoredFile?.body == Array("Hello, World!".utf8))
     }
 
     @Test("Content-Type header generation")
@@ -167,8 +168,8 @@ struct FormDataConversionTests {
         // Assert
         #expect(contentType.type == "multipart")
         #expect(contentType.subtype == "form-data")
-        #expect(contentType.parameters["boundary"] == boundary.value)
-        #expect(!boundary.value.isEmpty)
+        #expect(contentType.parameters[.boundary] == boundary.rawValue)
+        #expect(!boundary.rawValue.isEmpty)
     }
 
     @Test("Custom boundary is preserved")
@@ -177,7 +178,7 @@ struct FormDataConversionTests {
         var formData = Form.Data.Entry.List()
         formData.append(name: "test", value: "value")
 
-        let customBoundary = RFC_2046.Boundary("MyCustomBoundary123")
+        let customBoundary = try RFC_2046.Boundary("MyCustomBoundary123")
 
         // Act
         let multipart = try RFC_2046.Multipart(formData, boundary: customBoundary)

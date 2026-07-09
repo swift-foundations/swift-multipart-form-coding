@@ -18,6 +18,19 @@ import RFC_2046
 import RFC_2183
 import RFC_7578
 
+// MARK: - Default Boundary Generation
+
+/// Generates a unique multipart/form-data boundary.
+///
+/// RFC 2046 (§5.1.1) no longer ships a random-boundary generator on
+/// `RFC_2046.Boundary`; the default boundary is now produced consumer-side.
+/// The `"----FormBoundary" + UUID` form is boundary-grammar-valid by
+/// construction (ASCII prefix + hex/hyphen UUID, 52 chars ≤ 70), so it is
+/// built via the pre-validated `__unchecked` initializer.
+private func generateFormBoundary() -> RFC_2046.Boundary {
+    RFC_2046.Boundary(__unchecked: (), rawValue: "----FormBoundary\(UUID().uuidString)")
+}
+
 // MARK: - Multipart → Form.Data.Entry.List
 
 extension Form.Data.Entry.List {
@@ -48,7 +61,7 @@ extension Form.Data.Entry.List {
         // Parse all parts directly to preserve multiple values for same field name
         for part in multipart.parts {
             // Use typed Content-Disposition header
-            guard let disposition = part.typedHeaders.contentDisposition,
+            guard let disposition = part.headers.contentDisposition,
                   disposition.type == .formData else {
                 continue
             }
@@ -60,19 +73,19 @@ extension Form.Data.Entry.List {
 
             // Check if this part has a filename (indicating a file upload)
             if let filename = disposition.filename {
-                let contentType = part.typedHeaders.contentType?.headerValue ?? "application/octet-stream"
+                let contentType = part.headers.contentType?.headerValue ?? "application/octet-stream"
 
                 self.append(
                     name: fieldName,
                     file: Form.Data.File(
-                        name: filename,
+                        name: filename.value,
                         type: contentType,
-                        body: part.content
+                        body: part.content.rawValue.map(\.underlying)
                     )
                 )
             } else {
                 // Text field - parse content as string
-                if let stringValue = String(data: part.content, encoding: .utf8) {
+                if let stringValue = String(bytes: part.content.rawValue.map(\.underlying), encoding: .utf8) {
                     self.append(name: fieldName, value: stringValue)
                 }
             }
@@ -84,10 +97,10 @@ extension Form.Data.Entry.List {
     /// - Parameter disposition: The Content-Disposition header value
     /// - Returns: The field name, or nil if parsing fails
     ///
-    /// - Deprecated: Use `RFC_2183.ContentDisposition(parsing:).name` instead
-    @available(*, deprecated, message: "Use RFC_2183.ContentDisposition(parsing:).name instead")
+    /// - Deprecated: Use `RFC_2183.ContentDisposition(_:).name` instead
+    @available(*, deprecated, message: "Use RFC_2183.ContentDisposition(_:).name instead")
     private static func parseFieldName(from disposition: String) -> String? {
-        (try? RFC_2183.ContentDisposition(parsing: disposition))?.name
+        (try? RFC_2183.ContentDisposition(disposition))?.name
     }
 
     /// Parses the filename from a Content-Disposition header.
@@ -95,10 +108,10 @@ extension Form.Data.Entry.List {
     /// - Parameter disposition: The Content-Disposition header value
     /// - Returns: The filename, or nil if not present
     ///
-    /// - Deprecated: Use `RFC_2183.ContentDisposition(parsing:).filename` instead
-    @available(*, deprecated, message: "Use RFC_2183.ContentDisposition(parsing:).filename instead")
+    /// - Deprecated: Use `RFC_2183.ContentDisposition(_:).filename` instead
+    @available(*, deprecated, message: "Use RFC_2183.ContentDisposition(_:).filename instead")
     private static func parseFilename(from disposition: String) -> String? {
-        (try? RFC_2183.ContentDisposition(parsing: disposition))?.filename
+        (try? RFC_2183.ContentDisposition(disposition))?.filename?.value
     }
 }
 
@@ -143,24 +156,27 @@ extension RFC_2046.Multipart {
             switch entry.value {
             case .string(let value):
                 // Create text field part using typed Headers
-                let content = Data(value.utf8)
+                var headers = RFC_2046.BodyPart.Headers()
+                headers.contentDisposition = RFC_2183.ContentDisposition.formData(name: entry.name)
+                headers.contentType = .textPlainUTF8
                 parts.append(RFC_2046.BodyPart(
-                    headers: .formDataTextField(name: entry.name),
-                    content: content
+                    headers: headers,
+                    content: RFC_2046.BodyPart.Content(value)
                 ))
 
             case .file(let file):
                 // Create file upload part using typed Headers
-                let contentType = !file.type.isEmpty
-                    ? try? RFC_2045.ContentType(parsing: file.type)
+                var headers = RFC_2046.BodyPart.Headers()
+                headers.contentDisposition = RFC_2183.ContentDisposition.formData(
+                    name: entry.name,
+                    filename: try? RFC_2183.Filename(file.name)
+                )
+                headers.contentType = !file.type.isEmpty
+                    ? try? RFC_2045.ContentType(file.type)
                     : nil
                 parts.append(RFC_2046.BodyPart(
-                    headers: .formDataFile(
-                        name: entry.name,
-                        filename: file.name,
-                        contentType: contentType
-                    ),
-                    content: file.body
+                    headers: headers,
+                    content: RFC_2046.BodyPart.Content(file.body.map { Byte($0) })
                 ))
             }
         }
@@ -169,7 +185,7 @@ extension RFC_2046.Multipart {
         self = try RFC_2046.Multipart(
             subtype: .formData,
             parts: parts,
-            boundary: boundary
+            boundary: boundary ?? generateFormBoundary()
         )
     }
 }
@@ -197,12 +213,13 @@ extension Form.Data.Entry.List {
     /// // contentType.headerValue = "multipart/form-data; boundary=----WebKitFormBoundary..."
     /// ```
     public func multipartContentType(boundary: RFC_2046.Boundary? = nil) -> (contentType: RFC_2045.ContentType, boundary: RFC_2046.Boundary) {
-        let actualBoundary = boundary ?? RFC_2046.Boundary()
+        let actualBoundary = boundary ?? generateFormBoundary()
         return (
             contentType: RFC_2045.ContentType(
+                __unchecked: (),
                 type: "multipart",
                 subtype: "form-data",
-                parameters: ["boundary": actualBoundary.value]
+                parameters: [.boundary: actualBoundary.rawValue]
             ),
             boundary: actualBoundary
         )

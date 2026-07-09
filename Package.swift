@@ -1,4 +1,4 @@
-// swift-tools-version:6.1
+// swift-tools-version: 6.3.1
 
 import PackageDescription
 
@@ -21,20 +21,20 @@ extension Target.Dependency {
 let package = Package(
     name: "swift-multipart-form-coding",
     platforms: [
-        .macOS(.v15),
-        .iOS(.v18),
-        .tvOS(.v18),
-        .watchOS(.v11)
+        .macOS(.v26),
+        .iOS(.v26),
+        .tvOS(.v26),
+        .watchOS(.v26)
     ],
     products: [
         .library(name: .multipartFormCoding, targets: [.multipartFormCoding])
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-ietf/swift-rfc-2045.git", from: "0.1.0"),
-        .package(path: "/Users/coen/Developer/swift-standards/swift-rfc-2046"),
-        .package(path: "/Users/coen/Developer/swift-standards/swift-rfc-2183"),
-        .package(path: "/Users/coen/Developer/swift-standards/swift-rfc-7578"),
-        .package(path: "/Users/coen/Developer/swift-standards/swift-whatwg-html")
+        .package(url: "https://github.com/swift-ietf/swift-rfc-2045.git", branch: "main"),
+        .package(url: "https://github.com/swift-ietf/swift-rfc-2046.git", branch: "main"),
+        .package(url: "https://github.com/swift-ietf/swift-rfc-2183.git", branch: "main"),
+        .package(url: "https://github.com/swift-ietf/swift-rfc-7578.git", branch: "main"),
+        .package(url: "https://github.com/swift-whatwg/swift-whatwg-html.git", branch: "main")
     ],
     targets: [
         .target(
