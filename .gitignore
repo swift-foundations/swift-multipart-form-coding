@@ -50,3 +50,7 @@ CLAUDE.MD
 *.temp
 
 .swift-version
+
+
+# SwiftLint Remote Config Cache
+.swiftlint/RemoteConfigCache

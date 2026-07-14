@@ -1,5 +1,6 @@
-import Testing
 import Foundation
+import Testing
+
 @testable import MultipartFormCoding
 
 @Suite("DateFormatter Extensions")

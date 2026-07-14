@@ -11,12 +11,12 @@
 // ===----------------------------------------------------------------------===//
 
 import Foundation
-import WHATWG_HTML_Forms
-import WHATWG_HTML_FormData
 import RFC_2045
 import RFC_2046
 import RFC_2183
 import RFC_7578
+import WHATWG_HTML_FormData
+import WHATWG_HTML_Forms
 
 // MARK: - Default Boundary Generation
 
@@ -62,7 +62,8 @@ extension Form.Data.Entry.List {
         for part in multipart.parts {
             // Use typed Content-Disposition header
             guard let disposition = part.headers.contentDisposition,
-                  disposition.type == .formData else {
+                disposition.type == .formData
+            else {
                 continue
             }
 
@@ -73,7 +74,8 @@ extension Form.Data.Entry.List {
 
             // Check if this part has a filename (indicating a file upload)
             if let filename = disposition.filename {
-                let contentType = part.headers.contentType?.headerValue ?? "application/octet-stream"
+                let contentType =
+                    part.headers.contentType?.headerValue ?? "application/octet-stream"
 
                 self.append(
                     name: fieldName,
@@ -85,7 +87,10 @@ extension Form.Data.Entry.List {
                 )
             } else {
                 // Text field - parse content as string
-                if let stringValue = String(bytes: part.content.rawValue.map(\.underlying), encoding: .utf8) {
+                if let stringValue = String(
+                    bytes: part.content.rawValue.map(\.underlying),
+                    encoding: .utf8
+                ) {
                     self.append(name: fieldName, value: stringValue)
                 }
             }
@@ -159,10 +164,12 @@ extension RFC_2046.Multipart {
                 var headers = RFC_2046.BodyPart.Headers()
                 headers.contentDisposition = RFC_2183.ContentDisposition.formData(name: entry.name)
                 headers.contentType = .textPlainUTF8
-                parts.append(RFC_2046.BodyPart(
-                    headers: headers,
-                    content: RFC_2046.BodyPart.Content(value)
-                ))
+                parts.append(
+                    RFC_2046.BodyPart(
+                        headers: headers,
+                        content: RFC_2046.BodyPart.Content(value)
+                    )
+                )
 
             case .file(let file):
                 // Create file upload part using typed Headers
@@ -171,13 +178,16 @@ extension RFC_2046.Multipart {
                     name: entry.name,
                     filename: try? RFC_2183.Filename(file.name)
                 )
-                headers.contentType = !file.type.isEmpty
+                headers.contentType =
+                    !file.type.isEmpty
                     ? try? RFC_2045.ContentType(file.type)
                     : nil
-                parts.append(RFC_2046.BodyPart(
-                    headers: headers,
-                    content: RFC_2046.BodyPart.Content(file.body.map { Byte($0) })
-                ))
+                parts.append(
+                    RFC_2046.BodyPart(
+                        headers: headers,
+                        content: RFC_2046.BodyPart.Content(file.body.map { Byte($0) })
+                    )
+                )
             }
         }
 
@@ -212,7 +222,9 @@ extension Form.Data.Entry.List {
     /// request.setValue(contentType.headerValue, forHTTPHeaderField: "Content-Type")
     /// // contentType.headerValue = "multipart/form-data; boundary=----WebKitFormBoundary..."
     /// ```
-    public func multipartContentType(boundary: RFC_2046.Boundary? = nil) -> (contentType: RFC_2045.ContentType, boundary: RFC_2046.Boundary) {
+    public func multipartContentType(
+        boundary: RFC_2046.Boundary? = nil
+    ) -> (contentType: RFC_2045.ContentType, boundary: RFC_2046.Boundary) {
         let actualBoundary = boundary ?? generateFormBoundary()
         return (
             contentType: RFC_2045.ContentType(

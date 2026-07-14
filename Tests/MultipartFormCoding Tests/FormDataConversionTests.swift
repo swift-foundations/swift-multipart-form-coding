@@ -10,15 +10,16 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Testing
 import Foundation
-@testable import MultipartFormCoding
-import WHATWG_HTML_Forms
-import WHATWG_HTML_FormData
-import RFC_2046
-import RFC_7578
 import RFC_2045
+import RFC_2046
 import RFC_2183
+import RFC_7578
+import Testing
+import WHATWG_HTML_FormData
+import WHATWG_HTML_Forms
+
+@testable import MultipartFormCoding
 
 @Suite("Form.Data ↔ Multipart Conversion Tests")
 struct FormDataConversionTests {
@@ -52,7 +53,7 @@ struct FormDataConversionTests {
             file: Form.Data.File(
                 name: "photo.jpg",
                 type: "image/jpeg",
-                body: [0xFF, 0xD8, 0xFF, 0xE0] // JPEG magic number
+                body: [0xFF, 0xD8, 0xFF, 0xE0]  // JPEG magic number
             )
         )
 
@@ -70,7 +71,8 @@ struct FormDataConversionTests {
         // Check file field exists in parts
         let hasAvatarPart = multipart.parts.contains { part in
             guard let disposition = part.headers[.contentDisposition] else { return false }
-            return disposition.contains("name=\"avatar\"") && disposition.contains("filename=\"photo.jpg\"")
+            return disposition.contains("name=\"avatar\"")
+                && disposition.contains("filename=\"photo.jpg\"")
         }
         #expect(hasAvatarPart)
     }
@@ -81,7 +83,7 @@ struct FormDataConversionTests {
         let multipart = try RFC_2046.Multipart.formData(
             fields: [
                 "username": "bob",
-                "age": "30"
+                "age": "30",
             ],
             files: []
         )
@@ -98,7 +100,7 @@ struct FormDataConversionTests {
     @Test("Multipart to Form.Data.Entry.List conversion with file")
     func multipartToFormDataWithFile() throws {
         // Arrange
-        let imageData: [UInt8] = [0xFF, 0xD8, 0xFF, 0xE0] // JPEG magic number
+        let imageData: [UInt8] = [0xFF, 0xD8, 0xFF, 0xE0]  // JPEG magic number
         let file = try RFC_7578.Form.Data.File(
             fieldName: "photo",
             filename: try RFC_2183.Filename("image.jpg"),
