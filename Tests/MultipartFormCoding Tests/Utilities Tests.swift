@@ -3,19 +3,19 @@ import Testing
 
 @testable import MultipartFormCoding
 
-@Suite("DateFormatter Extensions")
-struct DateFormatterTests {
+@Suite
+struct Test {
 
     @MainActor
-    @Test("form DateFormatter has correct format")
-    func testFormDateFormatter() {
+    @Test
+    func `Form Date Formatter has correct format`() {
         let formatter = DateFormatter.form
         #expect(formatter.dateFormat == "yyyy-MM-dd")
     }
 
     @MainActor
-    @Test("form DateFormatter formats dates correctly")
-    func testFormDateFormatting() {
+    @Test
+    func `Form Date Formatter formats dates correctly`() {
         let formatter = DateFormatter.form
         formatter.timeZone = TimeZone(identifier: "UTC")
 
@@ -34,8 +34,8 @@ struct DateFormatterTests {
     }
 
     @MainActor
-    @Test("form DateFormatter parses dates correctly")
-    func testFormDateParsing() {
+    @Test
+    func `Form Date Formatter parses dates correctly`() {
         let formatter = DateFormatter.form
         formatter.timeZone = TimeZone(identifier: "UTC")
 
@@ -56,19 +56,19 @@ struct DateFormatterTests {
     }
 }
 
-@Suite("Data Extensions")
-struct DataExtensionsTests {
+@Suite
+struct Test {
 
-    @Test("append(String) appends UTF-8 encoded string")
-    func testAppendString() {
+    @Test
+    func `Append(String) appends UTF-8 encoded string`() {
         var data = Data()
         data.append("Hello")
 
         #expect(data == Data("Hello".utf8))
     }
 
-    @Test("append(String) appends multiple strings")
-    func testAppendMultipleStrings() {
+    @Test
+    func `Append(String) appends multiple strings`() {
         var data = Data()
         data.append("Hello")
         data.append(", ")
@@ -77,8 +77,8 @@ struct DataExtensionsTests {
         #expect(data == Data("Hello, World".utf8))
     }
 
-    @Test("append(String) handles empty string")
-    func testAppendEmptyString() {
+    @Test
+    func `Append(String) handles empty string`() {
         var data = Data("Initial".utf8)
         let initialCount = data.count
 
@@ -87,8 +87,8 @@ struct DataExtensionsTests {
         #expect(data.count == initialCount)
     }
 
-    @Test("append(String) handles special characters")
-    func testAppendSpecialCharacters() {
+    @Test
+    func `Append(String) handles special characters`() {
         var data = Data()
         data.append("Hello 你好 🌍")
 
@@ -96,8 +96,8 @@ struct DataExtensionsTests {
         #expect(data == expected)
     }
 
-    @Test("append(String) handles newlines and CRLF")
-    func testAppendNewlines() {
+    @Test
+    func `Append(String) handles newlines and CRLF`() {
         var data = Data()
         data.append("Line 1\r\n")
         data.append("Line 2\n")
@@ -107,8 +107,8 @@ struct DataExtensionsTests {
         #expect(data == expected)
     }
 
-    @Test("append(String) can build multipart boundaries")
-    func testAppendMultipartBoundaries() {
+    @Test
+    func `Append(String) can build multipart boundaries`() {
         let boundary = "----Boundary123"
         var data = Data()
 
@@ -121,11 +121,11 @@ struct DataExtensionsTests {
     }
 }
 
-@Suite("URLRouting Field Extensions")
-struct FieldExtensionsTests {
+@Suite
+struct Test {
 
-    @Test("contentType extension exists and compiles")
-    func testContentTypeExtensionExists() {
+    @Test
+    func `Content Type extension exists and compiles`() {
         // This test verifies that the Field.contentType extension compiles
         // The actual usage would require a Parser conforming type, which is
         // beyond the scope of unit testing the extension itself.

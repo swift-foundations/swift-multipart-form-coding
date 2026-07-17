@@ -21,11 +21,11 @@ import WHATWG_HTML_Forms
 
 @testable import MultipartFormCoding
 
-@Suite("Form.Data ↔ Multipart Conversion Tests")
-struct FormDataConversionTests {
+@Suite
+struct Test {
 
-    @Test("Form.Data.Entry.List to Multipart conversion with text fields")
-    func formDataToMultipartTextOnly() throws {
+    @Test
+    func `Form.Data.Entry.List to Multipart conversion with text fields`() throws {
         // Arrange
         var formData = Form.Data.Entry.List()
         formData.append(name: "username", value: "alice")
@@ -43,8 +43,8 @@ struct FormDataConversionTests {
         #expect(fields["email"] == "alice@example.com")
     }
 
-    @Test("Form.Data.Entry.List to Multipart conversion with file")
-    func formDataToMultipartWithFile() throws {
+    @Test
+    func `Form.Data.Entry.List to Multipart conversion with file`() throws {
         // Arrange
         var formData = Form.Data.Entry.List()
         formData.append(name: "username", value: "alice")
@@ -77,8 +77,8 @@ struct FormDataConversionTests {
         #expect(hasAvatarPart)
     }
 
-    @Test("Multipart to Form.Data.Entry.List conversion with text fields")
-    func multipartToFormDataTextOnly() throws {
+    @Test
+    func `Multipart to Form.Data.Entry.List conversion with text fields`() throws {
         // Arrange
         let multipart = try RFC_2046.Multipart.formData(
             fields: [
@@ -97,8 +97,8 @@ struct FormDataConversionTests {
         #expect(formData.first(named: "age")?.stringValue == "30")
     }
 
-    @Test("Multipart to Form.Data.Entry.List conversion with file")
-    func multipartToFormDataWithFile() throws {
+    @Test
+    func `Multipart to Form.Data.Entry.List conversion with file`() throws {
         // Arrange
         let imageData: [UInt8] = [0xFF, 0xD8, 0xFF, 0xE0]  // JPEG magic number
         let file = try RFC_7578.Form.Data.File(
@@ -130,8 +130,8 @@ struct FormDataConversionTests {
         #expect(photoFile?.body == imageData)
     }
 
-    @Test("Round-trip conversion preserves data")
-    func roundTripConversion() throws {
+    @Test
+    func `Round-trip conversion preserves data`() throws {
         // Arrange
         var original = Form.Data.Entry.List()
         original.append(name: "field1", value: "value1")
@@ -159,8 +159,8 @@ struct FormDataConversionTests {
         #expect(restoredFile?.body == Array("Hello, World!".utf8))
     }
 
-    @Test("Content-Type header generation")
-    func contentTypeGeneration() {
+    @Test
+    func `Content-Type header generation`() {
         // Arrange
         let formData = Form.Data.Entry.List()
 
@@ -174,8 +174,8 @@ struct FormDataConversionTests {
         #expect(!boundary.rawValue.isEmpty)
     }
 
-    @Test("Custom boundary is preserved")
-    func customBoundary() throws {
+    @Test
+    func `Custom boundary is preserved`() throws {
         // Arrange
         var formData = Form.Data.Entry.List()
         formData.append(name: "test", value: "value")
@@ -189,8 +189,8 @@ struct FormDataConversionTests {
         #expect(multipart.boundary == customBoundary)
     }
 
-    @Test("Empty Form.Data.Entry.List throws error")
-    func emptyFormDataThrows() {
+    @Test
+    func `Empty Form.Data.Entry.List throws error`() {
         // Arrange
         let emptyFormData = Form.Data.Entry.List()
 
@@ -200,8 +200,8 @@ struct FormDataConversionTests {
         }
     }
 
-    @Test("Multiple values for same field name preserved")
-    func multipleValues() throws {
+    @Test
+    func `Multiple values for same field name preserved`() throws {
         // Arrange
         var formData = Form.Data.Entry.List()
         formData.append(name: "interests", value: "swift")
