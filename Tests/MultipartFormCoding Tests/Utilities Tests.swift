@@ -4,7 +4,7 @@ import Testing
 @testable import MultipartFormCoding
 
 @Suite
-struct Test {
+struct DateFormatterFormTests {
 
     @MainActor
     @Test
@@ -57,7 +57,7 @@ struct Test {
 }
 
 @Suite
-struct Test {
+struct DataAppendStringTests {
 
     @Test
     func `Append(String) appends UTF-8 encoded string`() {
@@ -122,7 +122,7 @@ struct Test {
 }
 
 @Suite
-struct Test {
+struct ContentTypeExtensionTests {
 
     @Test
     func `Content Type extension exists and compiles`() {

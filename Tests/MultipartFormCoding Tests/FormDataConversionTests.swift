@@ -22,7 +22,7 @@ import WHATWG_HTML_Forms
 @testable import MultipartFormCoding
 
 @Suite
-struct Test {
+struct FormDataConversionTests {
 
     @Test
     func `Form.Data.Entry.List to Multipart conversion with text fields`() throws {
