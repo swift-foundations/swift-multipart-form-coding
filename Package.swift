@@ -55,7 +55,7 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "Coder Parity Tests",
+            name: "Multipart Form Coding Parity Tests",
             dependencies: [
                 .multipartFormCoding,
                 .rfc2045,
@@ -63,7 +63,7 @@ let package = Package(
                 .whatwgHTMLForms,
                 .whatwgHTMLFormData
             ],
-            path: "Tests/Coder Parity Tests",
+            path: "Tests/Multipart Form Coding Parity Tests",
             exclude: ["__Corpus__"]
         )
     ]
