@@ -5,5 +5,6 @@
 //  Created by Coen ten Thije Boonkkamp on 13/01/2025.
 //
 
-// Export RFC 2183 for Content-Disposition support
-@_exported import RFC_2183
+/// Compatibility module for the multipart form coder now owned by
+/// `swift-html-form-coder`.
+@_exported import HTML_Form_Coder_Multipart

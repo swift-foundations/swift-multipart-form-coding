@@ -10,12 +10,9 @@ extension String { var tests: Self { self + " Tests" } }
 
 extension Target.Dependency {
     static var multipartFormCoding: Self { .target(name: .multipartFormCoding) }
-    static var rfc2045: Self { .product(name: "RFC 2045", package: "swift-rfc-2045") }
-    static var rfc2046: Self { .product(name: "RFC 2046", package: "swift-rfc-2046") }
-    static var rfc2183: Self { .product(name: "RFC 2183", package: "swift-rfc-2183") }
-    static var rfc7578: Self { .product(name: "RFC 7578", package: "swift-rfc-7578") }
-    static var whatwgHTMLForms: Self { .product(name: "WHATWG HTML Forms", package: "swift-whatwg-html") }
-    static var whatwgHTMLFormData: Self { .product(name: "WHATWG HTML FormData", package: "swift-whatwg-html") }
+    static var htmlFormCoderMultipart: Self {
+        .product(name: "HTML Form Coder Multipart", package: "swift-html-form-coder")
+    }
 }
 
 let package = Package(
@@ -30,42 +27,18 @@ let package = Package(
         .library(name: .multipartFormCoding, targets: [.multipartFormCoding])
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-ietf/swift-rfc-2045.git", branch: "main"),
-        .package(url: "https://github.com/swift-ietf/swift-rfc-2046.git", branch: "main"),
-        .package(url: "https://github.com/swift-ietf/swift-rfc-2183.git", branch: "main"),
-        .package(url: "https://github.com/swift-ietf/swift-rfc-7578.git", branch: "main"),
-        .package(url: "https://github.com/swift-whatwg/swift-whatwg-html.git", branch: "main")
+        .package(
+            url: "https://github.com/swift-foundations/swift-html-form-coder.git",
+            branch: "main"
+        )
     ],
     targets: [
         .target(
             name: .multipartFormCoding,
             dependencies: [
-                .rfc2045,
-                .rfc2046,
-                .rfc2183,
-                .rfc7578,
-                .whatwgHTMLForms,
-                .whatwgHTMLFormData
+                .htmlFormCoderMultipart
             ]
         ),
-        .testTarget(
-            name: .multipartFormCoding.tests,
-            dependencies: [
-                .multipartFormCoding
-            ]
-        ),
-        .testTarget(
-            name: "Multipart Form Coding Parity Tests",
-            dependencies: [
-                .multipartFormCoding,
-                .rfc2045,
-                .rfc2046,
-                .whatwgHTMLForms,
-                .whatwgHTMLFormData
-            ],
-            path: "Tests/Multipart Form Coding Parity Tests",
-            exclude: ["__Corpus__"]
-        )
     ]
 )
 
